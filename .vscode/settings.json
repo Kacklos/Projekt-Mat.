@@ -1,5 +1,4 @@
 {
-    "git.autorefresh": false,
     "git.autoRepositoryDetection": "subFolders",
     "git.confirmSync": false
 }

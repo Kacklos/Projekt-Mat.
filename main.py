@@ -2,7 +2,8 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout
 import sys
 import pygame
-
+print(pygame.font.get_fonts)
+# font14 = pygame.font.Font()
 
 class Window(QWidget):
     def __init__(self):
@@ -15,8 +16,6 @@ class Window(QWidget):
         self.mass = 100
         self.running = True
 
-        
- 
         self.InitWindow()
     
     def set_mass(self):
@@ -32,6 +31,7 @@ class Window(QWidget):
         print(b2_mass)
         clock = pygame.time.Clock()
         screen = pygame.display.set_mode((800,600))
+        collision_counter = 0
 
         while True:
             #Events
@@ -46,6 +46,10 @@ class Window(QWidget):
             if b1_pos[0]+100 == b2_pos[0]:
                 b1_vel =- 1
                 b2_vel = 0
+                collision_counter +=1
+            if b1_pos[0] == 0:
+                b1_vel = 1
+                collision_counter +=1
             #Drawing
             screen.fill((48, 48, 48))
             pygame.draw.line(screen, (20,20,20), (0,505), (800,505), 5)
