@@ -1,9 +1,11 @@
+import sys
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout
-import sys
 import pygame
-print(pygame.font.get_fonts)
-# font14 = pygame.font.Font()
+
+pygame.font.init()
+font36 = pygame.font.SysFont("Arial", 36)
+font18 = pygame.font.SysFont("Arial", 18)
 
 class Window(QWidget):
     def __init__(self):
@@ -13,7 +15,7 @@ class Window(QWidget):
         self.left = 100
         self.width = 380
         self.height = 100
-        self.mass = 100
+        self.mass = 100.0
         self.running = True
 
         self.InitWindow()
@@ -22,13 +24,15 @@ class Window(QWidget):
         self.mass = 1000
 
     def pyg(self):
-        b1_pos = [100,400]
-        b2_pos = [300,400]
-        b1_vel = 0
+        b1 = pygame.Rect(200, 400, 100, 100)
+        b2 = pygame.Rect(500, 400, 100, 100)
+        b1_vel = 0.0
+        temp1 = 200
+        temp2 = 500
+        temp3 = 0
         b2_vel = -1
-        b1_mass = 1
+        b1_mass = 1.0
         b2_mass = self.mass
-        print(b2_mass)
         clock = pygame.time.Clock()
         screen = pygame.display.set_mode((800,600))
         collision_counter = 0
@@ -39,25 +43,46 @@ class Window(QWidget):
                 if event.type == pygame.QUIT:
                     sys.exit(0)
             
-            #Collisions
-            b1_pos[0]+=b1_vel
-            b2_pos[0]+=b2_vel
-            
-            if b1_pos[0]+100 == b2_pos[0]:
-                b1_vel =- 1
-                b2_vel = 0
+
+            if b1.colliderect(b2): #or b1.x >= b2.x+100:
+                if self.mass == 1:
+                    # temp3 = b1_vel
+                    # b1_vel = b2_vel
+                    # b2_vel = temp3
+                    b1_vel, b2_vel = b2_vel, b1_vel
+
+                else:
+                    b2_vel = b2_vel*(b2_mass - b1_mass)/(b2_mass + b1_mass) + b1_vel*2*b1_mass/(b2_mass+b1_mass)
+                    b1_vel = b2_vel*2*b2_mass/(b2_mass+b1_mass) + b1_vel*(b1_mass-b2_mass)/(b1_mass+b2_mass)
+                
+                temp2 +=0.1
                 collision_counter +=1
-            if b1_pos[0] == 0:
-                b1_vel = 1
+            if b1.collidepoint((0,450)):
+                b1_vel = -1*b1_vel
                 collision_counter +=1
+                temp1 +=0.1
+
+            # if b2.collidepoint((100,450))or b2.x <100:
+            #     temp2 +=0.01
+
             #Drawing
+            #Collisions
+            temp1 += b1_vel
+            temp2 += b2_vel
+            b1.x = temp1
+            b2.x = temp2
             screen.fill((48, 48, 48))
             pygame.draw.line(screen, (20,20,20), (0,505), (800,505), 5)
-            pygame.draw.rect(screen, (100,100,255), (b1_pos[0], b1_pos[1], 100, 100))
-            pygame.draw.rect(screen, (100,255,100), (b2_pos[0], b2_pos[1], 100, 100))
-            
-            pygame.display.update()
-            clock.tick(60)    
+            pygame.draw.rect(screen, (100,100,255), b1)
+            pygame.draw.rect(screen, (100,255,100), b2)
+
+
+
+            screen.blit(font36.render(str(collision_counter), False, (255, 255, 255)), (600, 50))
+            screen.blit(font18.render("Prędkość 1: %.4f" %b1_vel , False, (100, 100, 255)), (20, 50))
+            screen.blit(font18.render("Prędkość 2: %.4f" %b2_vel, False, (100, 255, 100)), (20,80))
+            pygame.display.update()  
+            clock.tick()
     
     def InitWindow(self):
         # etykiety
