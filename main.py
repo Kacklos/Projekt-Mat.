@@ -1,29 +1,14 @@
 import sys
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
 import pygame
 from pygame.locals import QUIT
 
 pygame.font.init()
 font36 = pygame.font.SysFont("Arial", 36)
 font18 = pygame.font.SysFont("Arial", 18)
-
-class Window(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.title = "Wyznaczanie cyfr liczby pi"
-        self.top = 100
-        self.left = 100
-        self.width = 380
-        self.height = 100
-        self.mass = 1000000.0
-        self.running = True
-
-        self.InitWindow()
-    
-    def set_mass(self):
-        self.mass = 1000
-
+'''
     def pyg(self):
         b1 = pygame.Rect(200, 400, 100, 100)
         b2 = pygame.Rect(500, 400, 100, 100)
@@ -31,6 +16,7 @@ class Window(QWidget):
         temp1 = 200
         temp2 = 500
         b2_vel = -1
+        
         b1_mass = 1.0
         b2_mass = self.mass
         clock = pygame.time.Clock()
@@ -90,36 +76,60 @@ class Window(QWidget):
             screen.blit(font18.render("Prędkość 2: %.4f" %b2_vel, False, (100, 255, 100)), (20,80))
             pygame.display.update()  
             clock.tick()
-    
-    def InitWindow(self):
-        # etykiety
-        etykieta1 = QLabel("Liczba 1:", self)
-        etykieta2 = QLabel("Liczba 2:", self)
-        etykieta3 = QLabel("Wynik:", self)
-        Btn = QPushButton("Start", self)
-        Btn.clicked.connect(self.pyg)
-        Btn2 = QPushButton("masa", self)
-        Btn2.clicked.connect(self.set_mass)
-        # przypisanie widgetów do układu tabelarycznego
-        uklad1 = QGridLayout()
-        uklad1.addWidget(etykieta1, 0,0)
-        uklad1.addWidget(etykieta2, 0, 1)
-        uklad1.addWidget(etykieta3, 0, 2)
-        uklad1.addWidget(Btn, 1,0)
-        uklad1.addWidget(Btn2, 1,2)
-
-        # przypisanie utworzonego układu do okna
-        self.setLayout(uklad1)
-
+'''
+class Window(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = "PyQt5 Slider"
+        self.top = 200
+        self.left = 500
+        self.width = 400
+        self.height = 200
+        self.mass = 0
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.setWindowTitle(self.title)
-        self.setGeometry(self.top, self.left, self.width, self.height)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.slider = QSlider()
+        self.slider.setOrientation(Qt.Horizontal)
+        self.slider.setTickPosition(QSlider.TicksBelow)
+        self.slider.setTickInterval(1)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(4)
+        self.slider.valueChanged.connect(self.set_mass)
         
+        self.l1 = QLabel("0")
+        self.l1.setFont(QtGui.QFont("Sanserif", 12))
+
+        btn1 = QPushButton("Oblicz")
+        l2 = QLabel("Masa 1:")
+        l2.setFont(QtGui.QFont("Sanserif", 12))
+        l3 = QLabel("Masa 2:")
+        l3.setFont(QtGui.QFont("Sanserif", 12))
+        l4 = QLabel("1")
+        l4.setFont(QtGui.QFont("Sanserif", 12))
         
+        hb1 = QHBoxLayout()
+        hb1.addWidget(l2)
+        hb1.addWidget(l4)
+        hb2 = QHBoxLayout()
+        hb2.addWidget(l3)
+        hb2.addWidget(self.l1)
 
-
+        vb = QVBoxLayout()
+        vb.addLayout(hb1)
+        vb.addLayout(hb2)
+        vb.addWidget(self.slider)
+        vb.addWidget(btn1)
+        
+        self.setLayout(vb)
         self.show()
  
+    def set_mass(self):
+        self.mass = pow(100, self.slider.value())
+        self.l1.setText(str(self.mass))
+ 
+    def oblicz(self):
+        pass
 
 App = QApplication(sys.argv)
 window = Window()
