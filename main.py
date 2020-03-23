@@ -5,24 +5,28 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLay
 import pygame
 from pygame.locals import QUIT
 
+
 pygame.font.init()
 font36 = pygame.font.SysFont("Arial", 36)
 font18 = pygame.font.SysFont("Arial", 18)
-'''
-    def pyg(self):
-        b1 = pygame.Rect(200, 400, 100, 100)
-        b2 = pygame.Rect(500, 400, 100, 100)
-        b1_vel = 0.0
-        temp1 = 200
-        temp2 = 500
-        b2_vel = -1
-        
-        b1_mass = 1.0
-        b2_mass = self.mass
-        clock = pygame.time.Clock()
-        screen = pygame.display.set_mode((800,600))
-        collision_counter = 0
 
+
+class Oblicz(object):
+    def __init__(self, mass):
+        self.b1 = pygame.Rect(200, 400, 100, 100)
+        self.b2 = pygame.Rect(500, 400, 100, 100)
+        self.b1_vel = 0.0
+        self.temp1 = 200
+        self.temp2 = 500
+        self.b2_vel = -1
+        
+        self.b1_mass = 1.0
+        self.b2_mass = mass
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((800,600))
+        self.collision_counter = 0
+    
+    def oblicz(self):
         while True:
             #Events
             for event in pygame.event.get():
@@ -30,53 +34,54 @@ font18 = pygame.font.SysFont("Arial", 18)
                     sys.exit(0)
             
             # Sprawdzanie kolizji
-            if b1.colliderect(b2) or b1.x >= b2.x+100:
-                if self.mass == 1:
-                    b1_vel, b2_vel = b2_vel, b1_vel
+            if self.b1.colliderect(self.b2) or self.b1.x >= self.b2.x+100:
+                if self.b2_mass == 1:
+                    self.b1_vel, self.b2_vel = self.b2_vel, self.b1_vel
                 else:
-                    b2_vel = b2_vel*(b2_mass - b1_mass)/(b2_mass + b1_mass) + b1_vel*2*b1_mass/(b2_mass+b1_mass)
-                    b1_vel = b2_vel*2*b2_mass/(b2_mass+b1_mass) + b1_vel*(b1_mass-b2_mass)/(b1_mass+b2_mass)
+                    self.b2_vel = self.b2_vel*(self.b2_mass - self.b1_mass)/(self.b2_mass + self.b1_mass) + self.b1_vel*2*self.b1_mass/(self.b2_mass+self.b1_mass)
+                    self.b1_vel = self.b2_vel*2*self.b2_mass/(self.b2_mass+self.b1_mass) + self.b1_vel*(self.b1_mass-self.b2_mass)/(self.b1_mass+self.b2_mass)
                 
                 # Przesunięcie po odbiciu
-                if self.mass <1000:
-                    temp2 += 1
+                if self.b2_mass <1000:
+                    self.temp2 += 1
                 else:
                     # W celu przyspieszenia oraz większej dokładności całości dałem mniejsze przesunięcie
-                    temp2 += 0.1
-                collision_counter +=1
+                    self.temp2 += 0.1
+                self.collision_counter +=1
             
             # Kolizja ze ścianą
-            if b1.collidepoint((0,450)) or b1.x <0:
-                b1_vel = -1*b1_vel
-                collision_counter +=1
-                temp1 +=0.1
+            if self.b1.collidepoint((0,450)) or self.b1.x <0:
+                self.b1_vel = -1*self.b1_vel
+                self.collision_counter +=1
+                self.temp1 +=0.1
 
-            print(b2.x)
+            print(self.b2.x)
             # Ruch # Bez użycia pomocniczych zmiennych pygame wariował
-            temp1 += b1_vel
-            temp2 += b2_vel
-            b1.x = temp1
-            b2.x = temp2
+            self.temp1 += self.b1_vel
+            self.temp2 += self.b2_vel
+            self.b1.x = self.temp1
+            self.b2.x = self.temp2
 
             # Wyświetlanie
-            screen.fill((48, 48, 48))
-            pygame.draw.line(screen, (20,20,20), (0,505), (800,505), 5)
-            pygame.draw.rect(screen, (100,100,255), b1)
-            pygame.draw.rect(screen, (100,255,100), b2)
+            self.screen.fill((48, 48, 48))
+            pygame.draw.line(self.screen, (20,20,20), (0,505), (800,505), 5)
+            pygame.draw.rect(self.screen, (100,100,255), self.b1)
+            pygame.draw.rect(self.screen, (100,255,100), self.b2)
 
-            if b1.x >800:
-                tri1 = (b1.x - 800)//100
-                pygame.draw.polygon(screen, (100, 100, 255), [(800, 500-tri1), (750, 475-tri1), (750, 525-tri1)])
-            if b2.x > 800:
-                tri2 = (b2.x - 800)//100
-                pygame.draw.polygon(screen, (100, 255, 100), [(800, 500-tri2), (750, 475-tri2), (750, 525-tri2)])
+            if self.b1.x >800:
+                tri1 = (self.b1.x - 800)//100
+                pygame.draw.polygon(self.screen, (100, 100, 255), [(800, 500-tri1), (750, 475-tri1), (750, 525-tri1)])
+            if self.b2.x > 800:
+                tri2 = (self.b2.x - 800)//100
+                pygame.draw.polygon(self.screen, (100, 255, 100), [(800, 500-tri2), (750, 475-tri2), (750, 525-tri2)])
             
-            screen.blit(font36.render(str(collision_counter), False, (255, 255, 255)), (600, 50))
-            screen.blit(font18.render("Prędkość 1: %.4f" %b1_vel , False, (100, 100, 255)), (20, 50))
-            screen.blit(font18.render("Prędkość 2: %.4f" %b2_vel, False, (100, 255, 100)), (20,80))
+            self.screen.blit(font36.render(str(self.collision_counter), False, (255, 255, 255)), (600, 50))
+            self.screen.blit(font18.render("Prędkość 1: %.4f" %self.b1_vel , False, (100, 100, 255)), (20, 50))
+            self.screen.blit(font18.render("Prędkość 2: %.4f" %self.b2_vel, False, (100, 255, 100)), (20,80))
             pygame.display.update()  
-            clock.tick()
-'''
+            self.clock.tick()
+
+
 class Window(QWidget):
     def __init__(self):
         super().__init__()
@@ -85,7 +90,7 @@ class Window(QWidget):
         self.left = 500
         self.width = 400
         self.height = 200
-        self.mass = 0
+        self.mass = 1
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -97,10 +102,11 @@ class Window(QWidget):
         self.slider.setMaximum(4)
         self.slider.valueChanged.connect(self.set_mass)
         
-        self.l1 = QLabel("0")
+        self.l1 = QLabel(str(self.mass))
         self.l1.setFont(QtGui.QFont("Sanserif", 12))
 
         btn1 = QPushButton("Oblicz")
+        btn1.clicked.connect(self.oblicz)
         l2 = QLabel("Masa 1:")
         l2.setFont(QtGui.QFont("Sanserif", 12))
         l3 = QLabel("Masa 2:")
@@ -129,7 +135,8 @@ class Window(QWidget):
         self.l1.setText(str(self.mass))
  
     def oblicz(self):
-        pass
+        o = Oblicz(self.mass)
+        o.oblicz()
 
 App = QApplication(sys.argv)
 window = Window()
