@@ -1,93 +1,62 @@
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout
 import sys
-import pygame
-print(pygame.font.get_fonts)
-# font14 = pygame.font.Font()
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QGridLayout, QSlider, QHBoxLayout, QVBoxLayout
 
 class Window(QWidget):
     def __init__(self):
         super().__init__()
-        self.title = "PyQt5 Drawing Rectangle"
-        self.top = 100
-        self.left = 100
-        self.width = 380
-        self.height = 100
-        self.mass = 100
-        self.running = True
-
-        self.InitWindow()
-    
-    def set_mass(self):
-        self.mass = 1000
-
-    def pyg(self):
-        b1_pos = [100,400]
-        b2_pos = [300,400]
-        b1_vel = 0
-        b2_vel = -1
-        b1_mass = 1
-        b2_mass = self.mass
-        print(b2_mass)
-        clock = pygame.time.Clock()
-        screen = pygame.display.set_mode((800,600))
-        collision_counter = 0
-
-        while True:
-            #Events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit(0)
-            
-            #Collisions
-            b1_pos[0]+=b1_vel
-            b2_pos[0]+=b2_vel
-            
-            if b1_pos[0]+100 == b2_pos[0]:
-                b1_vel =- 1
-                b2_vel = 0
-                collision_counter +=1
-            if b1_pos[0] == 0:
-                b1_vel = 1
-                collision_counter +=1
-            #Drawing
-            screen.fill((48, 48, 48))
-            pygame.draw.line(screen, (20,20,20), (0,505), (800,505), 5)
-            pygame.draw.rect(screen, (100,100,255), (b1_pos[0], b1_pos[1], 100, 100))
-            pygame.draw.rect(screen, (100,255,100), (b2_pos[0], b2_pos[1], 100, 100))
-            
-            pygame.display.update()
-            clock.tick(60)    
-    
-    def InitWindow(self):
-        # etykiety
-        etykieta1 = QLabel("Liczba 1:", self)
-        etykieta2 = QLabel("Liczba 2:", self)
-        etykieta3 = QLabel("Wynik:", self)
-        Btn = QPushButton("Start", self)
-        Btn.clicked.connect(self.pyg)
-        Btn2 = QPushButton("masa", self)
-        Btn2.clicked.connect(self.set_mass)
-        # przypisanie widgetów do układu tabelarycznego
-        uklad1 = QGridLayout()
-        uklad1.addWidget(etykieta1, 0,0)
-        uklad1.addWidget(etykieta2, 0, 1)
-        uklad1.addWidget(etykieta3, 0, 2)
-        uklad1.addWidget(Btn, 1,0)
-        uklad1.addWidget(Btn2, 1,2)
-
-        # przypisanie utworzonego układu do okna
-        self.setLayout(uklad1)
-
+        self.title = "Wyliczanie pi"
+        self.top = 200
+        self.left = 500
+        self.width = 400
+        self.height = 200
+        self.mass = 0
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.setWindowTitle(self.title)
-        self.setGeometry(self.top, self.left, self.width, self.height)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.slider = QSlider()
+        self.slider.setOrientation(Qt.Horizontal)
+        self.slider.setTickPosition(QSlider.TicksBelow)
+        self.slider.setTickInterval(1)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(4)
+        self.slider.valueChanged.connect(self.set_mass)
         
+        self.l1 = QLabel("0")
+        self.l1.setFont(QtGui.QFont("Sanserif", 12))
+
+        btn1 = QPushButton("Oblicz")
+        btn1.clicked.connect(self.oblicz)
+        l2 = QLabel("Masa 1:")
+        l2.setFont(QtGui.QFont("Sanserif", 12))
+        l3 = QLabel("Masa 2:")
+        l3.setFont(QtGui.QFont("Sanserif", 12))
+        l4 = QLabel("1")
+        l4.setFont(QtGui.QFont("Sanserif", 12))
         
+        hb1 = QHBoxLayout()
+        hb1.addWidget(l2)
+        hb1.addWidget(l4)
+        hb2 = QHBoxLayout()
+        hb2.addWidget(l3)
+        hb2.addWidget(self.l1)
 
-
+        vb = QVBoxLayout()
+        vb.addLayout(hb1)
+        vb.addLayout(hb2)
+        vb.addWidget(self.slider)
+        vb.addWidget(btn1)
+        
+        self.setLayout(vb)
         self.show()
  
+    def set_mass(self):
+        self.mass = pow(100, self.slider.value())
+        self.l1.setText(str(self.mass))
+ 
+    def oblicz(self):
+        pass
 
 App = QApplication(sys.argv)
 window = Window()
